@@ -43,17 +43,40 @@
             const diff = targetDate - new Date() + (offsetSeconds * 1000)
 
             function cfs(i) {
-                return (i == 1 ? '' : 's')
+                return (i == 1 ? ' ' : 's')
+            }
+            function cfe(i) {
+                return (i < 10 ? ' ' : '')
             }
 
-            const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30))
-            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24))
-            const weeks = Math.floor(days / 7)
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+            const millisecondsPerSecond = 1000
+            const millisecondsPerMinute = 60 * millisecondsPerSecond
+            const millisecondsPerHour = 60 * millisecondsPerMinute
+            const millisecondsPerDay = 24 * millisecondsPerHour
+            const millisecondsPerWeek = 7 * millisecondsPerDay
+            const millisecondsPerMonth = 30 * millisecondsPerDay // Approximation
 
-            return `${months} Month${cfs(months)} ${weeks} Week${cfs(weeks)} ${days} Day${cfs(days)} ${hours} Hour${cfs(hours)} ${minutes} Minute${cfs(minutes)} and ${seconds} Second${cfs(seconds)}`
+            let remainingMilliseconds = diff
+
+            const months = Math.floor(remainingMilliseconds / millisecondsPerMonth)
+            remainingMilliseconds %= millisecondsPerMonth
+
+            const weeks = Math.floor(remainingMilliseconds / millisecondsPerWeek)
+            remainingMilliseconds %= millisecondsPerWeek
+
+            const days = Math.floor(remainingMilliseconds / millisecondsPerDay)
+            remainingMilliseconds %= millisecondsPerDay
+
+            const hours = Math.floor(remainingMilliseconds / millisecondsPerHour)
+            remainingMilliseconds %= millisecondsPerHour
+
+            const minutes = Math.floor(remainingMilliseconds / millisecondsPerMinute)
+            remainingMilliseconds %= millisecondsPerMinute
+
+            const seconds = Math.floor(remainingMilliseconds / millisecondsPerSecond)
+
+
+            return `${months} Month${cfs(months)} ${weeks} Week${cfs(weeks)} ${days} Day${cfs(days)} ${hours + cfe(hours)} Hour${cfs(hours)} ${minutes + cfe(minutes)} Minute${cfs(minutes)} and ${seconds + cfe(seconds)} Second${cfs(seconds)}`
         }
 
 
