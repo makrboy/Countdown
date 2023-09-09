@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Countdown</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const rowHeight = 50
+        const targetDate = new Date("April 22, 2024 00:00:00")
+
+        const updateTime = (offsetSeconds) => {
+            const diff = targetDate - new Date() + (offsetSeconds * 1000)
+
+            function cfs(i) {
+                return (i == 1 ? '' : 's')
+            }
+
+            const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30))
+            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24))
+            const weeks = Math.floor(days / 7)
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+            return `${months} Month${cfs(months)} ${weeks} Week${cfs(weeks)} ${days} Day${cfs(days)} ${hours} Hour${cfs(hours)} ${minutes} Minute${cfs(minutes)} and ${seconds} Second${cfs(seconds)}`
+        }
+
+
+        ctx.font = `${canvas.width / 20}px Times New Roman`
+        ctx.textAlign = "center"
+
+        let last = Math.floor((targetDate - new Date() % (1000 * 60)) / 1000)
+        let start = Date.now()
+
+        function main() {
+            if (last != Math.floor((targetDate - new Date() % (1000 * 60)) / 1000)) {
+                last = Math.floor((targetDate - new Date() % (1000 * 60)) / 1000)
+                start = Date.now()
+            }
+
+            const offset = Math.round(canvas.height / rowHeight / 2)
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            for (let index = -1; index < canvas.height / rowHeight + 1; index++) {
+                const text = updateTime(index - offset)
+                ctx.fillStyle = index == offset ? 'rgb(0,255,0)' : 'rgb(0,25,0)'
+                ctx.fillText(text, canvas.width / 2, index * rowHeight + (Date.now() - start) / 1000 * rowHeight % rowHeight, canvas.width, rowHeight)
+            }
+            requestAnimationFrame(main)
+        }
+        main()
+    </script>
+</body>
+
+</html>
