@@ -32,11 +32,11 @@
             ctx.font = `${canvas.width / 20}px Times New Roman`
             ctx.textAlign = "center"
 
-        };
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        }
+        resizeCanvas()
+        window.addEventListener('resize', resizeCanvas)
 
-        const rowHeight = 50
+        const rowHeight = canvas.width / 15
         const targetDate = new Date("April 22, 2024 00:00:00")
 
         const updateTime = (offsetSeconds) => {
@@ -54,48 +54,35 @@
             const millisecondsPerHour = 60 * millisecondsPerMinute
             const millisecondsPerDay = 24 * millisecondsPerHour
             const millisecondsPerWeek = 7 * millisecondsPerDay
-            const millisecondsPerMonth = 30 * millisecondsPerDay // Approximation
-
+            const millisecondsPerMonth = 30 * millisecondsPerDay
             let remainingMilliseconds = diff
-
             const months = Math.floor(remainingMilliseconds / millisecondsPerMonth)
             remainingMilliseconds %= millisecondsPerMonth
-
             const weeks = Math.floor(remainingMilliseconds / millisecondsPerWeek)
             remainingMilliseconds %= millisecondsPerWeek
-
             const days = Math.floor(remainingMilliseconds / millisecondsPerDay)
             remainingMilliseconds %= millisecondsPerDay
-
             const hours = Math.floor(remainingMilliseconds / millisecondsPerHour)
             remainingMilliseconds %= millisecondsPerHour
-
             const minutes = Math.floor(remainingMilliseconds / millisecondsPerMinute)
             remainingMilliseconds %= millisecondsPerMinute
-
             const seconds = Math.floor(remainingMilliseconds / millisecondsPerSecond)
-
-
-            return `${months} Month${cfs(months)} ${weeks} Week${cfs(weeks)} ${days} Day${cfs(days)} ${hours + cfe(hours)} Hour${cfs(hours)} ${minutes + cfe(minutes)} Minute${cfs(minutes)} and ${seconds + cfe(seconds)} Second${cfs(seconds)}`
+            remainingMilliseconds %= millisecondsPerSecond
+            return [remainingMilliseconds, `${months} Month${cfs(months)} ${weeks} Week${cfs(weeks)} ${days} Day${cfs(days)} ${hours + cfe(hours)} Hour${cfs(hours)} ${minutes + cfe(minutes)} Minute${cfs(minutes)} and ${seconds + cfe(seconds)} Second${cfs(seconds)}`]
         }
-
-
-
         let last = Math.floor((targetDate - new Date() % (1000 * 60)) / 1000)
         let start = Date.now()
-
         function main() {
             if (last != Math.floor((targetDate - new Date() % (1000 * 60)) / 1000)) {
                 last = Math.floor((targetDate - new Date() % (1000 * 60)) / 1000)
                 start = Date.now()
             }
-
             const offset = Math.round(canvas.height / rowHeight / 2)
             ctx.clearRect(0, 0, canvas.width, canvas.height)
-            for (let index = -1; index < canvas.height / rowHeight + 1; index++) {
-                const text = updateTime(index - offset)
-                ctx.fillStyle = index == offset ? 'rgb(0,255,0)' : 'rgb(0,25,0)'
-                ctx.fillText(text, canvas.width / 2, index * rowHeight + (Date.now() - start) / 1000 * rowHeight % rowHeight, canvas.width, rowHeight)
+            for (let index = -2; index < canvas.height / rowHeight + 2; index++) {
+                let [extra, text] = updateTime(index - offset)
+                ctx.fillStyle = index == offset ? 'rgb(0,255,0)' : `rgb(0,${Math.abs(Math.cos(extra / 1000 * Math.PI)) * 255},0)`
+                ctx.fillText(text, canvas.width / 2, index * rowHeight + Math.cos(extra / 1000 * Math.PI / 2) * rowHeight - rowHeight, canvas.width, rowHeight)
             }
             requestAnimationFrame(main)
         }
